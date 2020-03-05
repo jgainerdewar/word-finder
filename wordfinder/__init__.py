@@ -1,0 +1,1 @@
+from wordfinder.letter_matrix import LetterMatrix, InvalidLetterMatrixException

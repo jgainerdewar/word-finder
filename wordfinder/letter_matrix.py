@@ -7,8 +7,19 @@ class LetterMatrix:
   """
   LETTER_REGEX = re.compile('^[A-Za-z]?$')
 
+  NEIGHBOR_TRANSFORMS = [
+    (-1, -1),
+    (-1, 0),
+    (-1, 1),
+    (0, -1),
+    (0, 1),
+    (1, -1),
+    (1, 0),
+    (1, 1),
+  ]
+
   def __init__(self, matrix):
-    validate_matrix(matrix)
+    LetterMatrix.validate(matrix)
     self.matrix = matrix
 
   @staticmethod
@@ -36,6 +47,34 @@ class LetterMatrix:
             "Only single letters are permitted, {} is invalid.".format(elm)
           )
     return True
+
+  def element(self, r, c):
+    """Return the element at the given coordinates."""
+    return self.matrix[r][c]
+
+  def exists(self, r, c):
+    """Return True if an element exists at the given coordinates, that
+    is, if the given coordinates are within the matrix."""
+    return r >= 0 and r < len(self.matrix) and \
+           c >= 0 and c < len(self.matrix[r])
+
+  def is_letter(self, r, c):
+    """True if the given element exists and is a letter, False otherwise."""
+    return self.exists(r, c) and self.element(r, c) != ""
+
+  def neighbors(self, r, c):
+    """
+    Return an array of tuples (row, column) representing elements adjacent to 
+    the one at the given coordinates. Empty elements are not included.
+    Adjacent elements include those diagonal to the given one, so each
+    element has a minimum of 0 and a maximum of 8 neightbors.
+    """
+    neighbors_arr = []
+    for t in LetterMatrix.NEIGHBOR_TRANSFORMS:
+      candidate = (r + t[0], c + t[1])
+      if self.is_letter(candidate[0], candidate[1]):
+        neighbors_arr.append(candidate)
+    return neighbors_arr
     
 
 class InvalidLetterMatrixException(Exception):

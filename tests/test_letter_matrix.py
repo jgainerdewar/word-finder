@@ -83,3 +83,50 @@ class TestLetterMatrix():
       self.fixture.neighbors(2, 1),
       [(1, 0), (1, 1), (2, 0), (2, 2)]
     )
+
+  def test_rec_find_words(self):
+    # If no words of the given length can be made, the empty list 
+    # is returned
+    assert_equal(
+      sorted(list(self.fixture._rec_find_words(100, 4, 0, {(4, 0)}))),
+      []
+    )
+    assert_equal(
+      sorted(list(self.fixture._rec_find_words(0, 4, 0, {(4, 0)}))),
+      []
+    )
+    assert_equal(
+      sorted(list(self.fixture._rec_find_words(-6, 4, 0, {(4, 0)}))),
+      []
+    )
+    assert_equal(
+      sorted(list(self.fixture._rec_find_words(1, 4, 0, {(4, 0)}))),
+      ["M"]
+    )
+    assert_equal(
+      sorted(list(self.fixture._rec_find_words(2, 4, 0, {(4, 0)}))),
+      ["MP", "MQ"]
+    )
+    assert_equal(
+      sorted(list(self.fixture._rec_find_words(3, 4, 0, {(4, 0)}))),
+      ["MPQ", "MQN", "MQP", "MQR"]
+    )
+
+  def test_find_words(self):
+    small_matrix = LetterMatrix([
+      ['A', 'B'],
+      ['' , 'C']
+    ])
+    assert_equal(small_matrix.find_words(0), [])
+    assert_equal(small_matrix.find_words(1), ['A', 'B', 'C'])
+    assert_equal(
+      small_matrix.find_words(2), 
+      ['AB', 'AC', 'BA', 'BC', 'CA', 'CB']
+    )
+    assert_equal(
+      small_matrix.find_words(3), 
+      ['ABC', 'ACB', 'BAC', 'BCA', 'CAB', 'CBA']
+    )
+    assert_equal(small_matrix.find_words(4), [])
+
+    

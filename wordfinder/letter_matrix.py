@@ -48,6 +48,14 @@ class LetterMatrix:
           )
     return True
 
+  def row_count(self):
+    """Returns the number of rows in the matrix."""
+    return len(self.matrix)
+
+  def column_count(self):
+    """Returns the number of columns in the matrix."""
+    return len(self.matrix[0])
+
   def element(self, r, c):
     """Return the element at the given coordinates."""
     return self.matrix[r][c]
@@ -55,8 +63,8 @@ class LetterMatrix:
   def exists(self, r, c):
     """Return True if an element exists at the given coordinates, that
     is, if the given coordinates are within the matrix."""
-    return r >= 0 and r < len(self.matrix) and \
-           c >= 0 and c < len(self.matrix[r])
+    return r >= 0 and r < self.row_count() and \
+           c >= 0 and c < self.column_count()
 
   def is_letter(self, r, c):
     """True if the given element exists and is a letter, False otherwise."""
@@ -75,7 +83,47 @@ class LetterMatrix:
       if self.is_letter(candidate[0], candidate[1]):
         neighbors_arr.append(candidate)
     return neighbors_arr
+
+  def find_words(self, length):
+    """
+    Return a sorted list of all strings of the given length that can be 
+    made by combining the letters in the matrix, following these rules:
+     - The first letter in the word can be any element in the matrix
+     - Adjacent letters in the word must be neighbors in the matrix
+     - Each element in the matrix can be used only once
+    """
+    words = set()
+    for row in range(self.row_count()):
+      for col in range(self.column_count()):
+        if self.is_letter(row, col):
+          words |= self._rec_find_words(length, row, col, {(row, col)})
+    return sorted(list(words))
+
+  def _rec_find_words(self, length, start_row, start_col, used_coords):
+    """
+    Find words of the given length that start at the given location.
+
+    length (int) -- Return words of exactly this length
+    start_row (int), start_col (int) -- the coordinates of the letter
+      to start the word with. We assume this element contains a valid 
+      letter.
+    used_coords (set of (int, int)) -- Contains the coordinates used 
+      already in this word, which shouldn't be reused.
+    """
+    words = set()
+    head = self.element(start_row, start_col)
+
+    if length == 1:
+      words.add(head)
+    elif length > 1:
+      for (r, c) in self.neighbors(start_row, start_col):
+        if (r, c) not in used_coords:
+          new_used_coords = used_coords | {(r, c)}
+          tails = self._rec_find_words(length - 1, r, c, new_used_coords)
+          words |= { head + tail for tail in tails }
     
+    return words
+
 
 class InvalidLetterMatrixException(Exception):
   pass

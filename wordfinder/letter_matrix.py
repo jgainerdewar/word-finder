@@ -84,24 +84,26 @@ class LetterMatrix:
         neighbors_arr.append(candidate)
     return neighbors_arr
 
-  def find_words(self, length):
+  def find_words(self, length, prefix=""):
     """
     Return a sorted list of all strings of the given length that can be 
     made by combining the letters in the matrix, following these rules:
      - The first letter in the word can be any element in the matrix
      - Adjacent letters in the word must be neighbors in the matrix
      - Each element in the matrix can be used only once
+     - The word must begin with the given prefix. If the prefix is 
+       longer than the desired word length no solutions will exist.
     """
     words = set()
     for row in range(self.row_count()):
       for col in range(self.column_count()):
         if self.is_letter(row, col):
-          words |= self._rec_find_words(length, row, col, {(row, col)})
+          words |= self._rec_find_words(length, row, col, {(row, col)}, prefix)
     return sorted(list(words))
 
-  def _rec_find_words(self, length, start_row, start_col, used_coords):
+  def _rec_find_words(self, length, start_row, start_col, used_coords, prefix):
     """
-    Find words of the given length that start at the given location.
+    Find words in 
 
     length (int) -- Return words of exactly this length
     start_row (int), start_col (int) -- the coordinates of the letter
@@ -109,17 +111,30 @@ class LetterMatrix:
       letter.
     used_coords (set of (int, int)) -- Contains the coordinates used 
       already in this word, which shouldn't be reused.
+    prefix (str) -- words must begin with this prefix. If the prefix
+      is longer than the desired word length, no solutions will exist.
     """
     words = set()
     head = self.element(start_row, start_col)
 
-    if length == 1:
+    if len(prefix) > length:
+      # Short circuit if prefix length means there are no valid solutions
+      pass
+    elif prefix and prefix[0] != head:
+      # Short circuit if this path doesn't result in words that 
+      # match our prefix
+      pass
+    elif length == 1:
       words.add(head)
     elif length > 1:
       for (r, c) in self.neighbors(start_row, start_col):
         if (r, c) not in used_coords:
-          new_used_coords = used_coords | {(r, c)}
-          tails = self._rec_find_words(length - 1, r, c, new_used_coords)
+          tails = self._rec_find_words(
+            length - 1, 
+            r, c, 
+            used_coords | {(r, c)}, 
+            prefix[1:]
+          )
           words |= { head + tail for tail in tails }
     
     return words

@@ -7,4 +7,9 @@ setup(name='WordFinder',
       author_email='janet.dewar@gmail.com',
       url='https://github.com/jgainerdewar/word-finder',
       packages=['wordfinder'],
+      entry_points={
+          'console_scripts': [
+              'wordfinder = wordfinder.__main__:main'
+          ]
+      },
      )

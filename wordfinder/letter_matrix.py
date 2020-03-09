@@ -120,7 +120,7 @@ class LetterMatrix:
     if len(prefix) > length:
       # Short circuit if prefix length means there are no valid solutions
       pass
-    elif prefix and prefix[0] != head:
+    elif prefix and prefix[0].upper() != head.upper():
       # Short circuit if this path doesn't result in words that 
       # match our prefix
       pass

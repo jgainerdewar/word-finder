@@ -161,4 +161,4 @@ class TestLetterMatrix():
     assert_equal(row_matrix.find_words(1, 'B'), ['B'])
     assert_equal(row_matrix.find_words(2, 'C'), ['CB', 'CD'])
     assert_equal(row_matrix.find_words(3, 'A'), ['ABC', 'AHG', 'AIJ'])
-    assert_equal(row_matrix.find_words(3, 'AI'), ['AIJ'])
+    assert_equal(row_matrix.find_words(3, 'ai'), ['AIJ'])

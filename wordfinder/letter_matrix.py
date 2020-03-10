@@ -84,7 +84,7 @@ class LetterMatrix:
         neighbors_arr.append(candidate)
     return neighbors_arr
 
-  def find_words(self, length, prefix=""):
+  def find_words(self, length, prefix="", dictionary=None):
     """
     Return a sorted list of all strings of the given length that can be 
     made by combining the letters in the matrix, following these rules:
@@ -93,17 +93,26 @@ class LetterMatrix:
      - Each element in the matrix can be used only once
      - The word must begin with the given prefix. If the prefix is 
        longer than the desired word length no solutions will exist.
+     - If a dictionary is given, the word must appear in it.
     """
     words = set()
     for row in range(self.row_count()):
       for col in range(self.column_count()):
         if self.is_letter(row, col):
-          words |= self._rec_find_words(length, row, col, {(row, col)}, prefix)
+          potential_words = self._rec_find_words(
+            length, row, col, {(row, col)}, prefix
+          )
+          if dictionary:
+            potential_words = { 
+              w for w in potential_words if dictionary.contains(w) 
+            }
+          words |= potential_words
     return sorted(list(words))
 
   def _rec_find_words(self, length, start_row, start_col, used_coords, prefix):
     """
-    Find words in 
+    Find words in the matrix as described in `find_words` matching the 
+    given requirements.
 
     length (int) -- Return words of exactly this length
     start_row (int), start_col (int) -- the coordinates of the letter

@@ -1,1 +1,2 @@
 from wordfinder.letter_matrix import LetterMatrix, InvalidLetterMatrixException
+from wordfinder.dictionary import Dictionary

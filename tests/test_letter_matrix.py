@@ -66,6 +66,11 @@ class TestLetterMatrix():
     assert_raises(IndexError, self.fixture.element, 6, 0)
     assert_raises(IndexError, self.fixture.element, 0, 5)
 
+  def test_word_at(self):
+    assert_equal(self.fixture.word_at([(0, 0)]), '')
+    assert_equal(self.fixture.word_at([(1, 1), (1, 2), (1, 3)]), 'FG')
+
+
   def test_exists(self):
     assert self.fixture.exists(0, 0)
     assert self.fixture.exists(5, 4)
@@ -84,54 +89,63 @@ class TestLetterMatrix():
       [(1, 0), (1, 1), (2, 0), (2, 2)]
     )
 
-  def test_rec_find_words_no_prefix(self):
+  def test_rec_find_word_locs_no_prefix(self):
     # If no words of the given length can be made, the empty list 
     # is returned
     assert_equal(
-      sorted(list(self.fixture._rec_find_words(100, 4, 0, {(4, 0)}, ""))),
+      sorted(list(self.fixture._rec_find_word_locs(100, 4, 0, {(4, 0)}, ""))),
       []
     )
     assert_equal(
-      sorted(list(self.fixture._rec_find_words(0, 4, 0, {(4, 0)}, ""))),
+      sorted(list(self.fixture._rec_find_word_locs(0, 4, 0, {(4, 0)}, ""))),
       []
     )
     assert_equal(
-      sorted(list(self.fixture._rec_find_words(-6, 4, 0, {(4, 0)}, ""))),
+      sorted(list(self.fixture._rec_find_word_locs(-6, 4, 0, {(4, 0)}, ""))),
       []
     )
     assert_equal(
-      sorted(list(self.fixture._rec_find_words(1, 4, 0, {(4, 0)}, ""))),
-      ["M"]
+      sorted(list(self.fixture._rec_find_word_locs(1, 4, 0, {(4, 0)}, ""))),
+      [[(4, 0)]]
     )
     assert_equal(
-      sorted(list(self.fixture._rec_find_words(2, 4, 0, {(4, 0)}, ""))),
-      ["MP", "MQ"]
+      sorted(list(self.fixture._rec_find_word_locs(2, 4, 0, {(4, 0)}, ""))),
+      [[(4, 0), (5, 0)], [(4, 0), (5, 1)]]
     )
     assert_equal(
-      sorted(list(self.fixture._rec_find_words(3, 4, 0, {(4, 0)}, ""))),
-      ["MPQ", "MQN", "MQP", "MQR"]
+      sorted(list(self.fixture._rec_find_word_locs(3, 4, 0, {(4, 0)}, ""))),
+      [
+        [(4, 0), (5, 0), (5, 1)], 
+        [(4, 0), (5, 1), (4, 2)], 
+        [(4, 0), (5, 1), (5, 0)], 
+        [(4, 0), (5, 1), (5, 2)], 
+      ]
     )
 
-  def test_rec_find_words_with_prefix(self):
+  def test_rec_find_word_locs_with_prefix(self):
     assert_equal(
-      sorted(list(self.fixture._rec_find_words(1, 4, 0, {(4, 0)}, "MP"))),
+      sorted(list(self.fixture._rec_find_word_locs(1, 4, 0, {(4, 0)}, "MP"))),
       []
     )
     assert_equal(
-      sorted(list(self.fixture._rec_find_words(1, 4, 0, {(4, 0)}, "K"))),
+      sorted(list(self.fixture._rec_find_word_locs(1, 4, 0, {(4, 0)}, "K"))),
       []
     )
     assert_equal(
-      sorted(list(self.fixture._rec_find_words(1, 4, 0, {(4, 0)}, "M"))),
-      ["M"]
+      sorted(list(self.fixture._rec_find_word_locs(1, 4, 0, {(4, 0)}, "M"))),
+      [[(4, 0)]]
     )
     assert_equal(
-      sorted(list(self.fixture._rec_find_words(3, 4, 0, {(4, 0)}, "MQ"))),
-      ["MQN", "MQP", "MQR"]
+      sorted(list(self.fixture._rec_find_word_locs(3, 4, 0, {(4, 0)}, "MQ"))),
+      [
+        [(4, 0), (5, 1), (4, 2)], 
+        [(4, 0), (5, 1), (5, 0)], 
+        [(4, 0), (5, 1), (5, 2)], 
+      ]
     )
     assert_equal(
-      sorted(list(self.fixture._rec_find_words(3, 4, 0, {(4, 0)}, "MQR"))),
-      ["MQR"]
+      sorted(list(self.fixture._rec_find_word_locs(3, 4, 0, {(4, 0)}, "MQR"))),
+      [[(4, 0), (5, 1), (5, 2)]]
     )
 
   def test_find_words_no_prefix(self):

@@ -60,6 +60,16 @@ class LetterMatrix:
     """Return the element at the given coordinates."""
     return self.matrix[r][c]
 
+  def elements(self, coords):
+    """Given a list of coordinates, return a list containing the values
+    in the matrix they correspond to."""
+    return [self.element(r, c) for (r, c) in coords]
+
+  def word_at(self, coords):
+    """Given a list of coordinates, return the string made from joining
+    the letters at those locations."""
+    return "".join(self.elements(coords))
+
   def exists(self, r, c):
     """Return True if an element exists at the given coordinates, that
     is, if the given coordinates are within the matrix."""
@@ -95,24 +105,47 @@ class LetterMatrix:
        longer than the desired word length no solutions will exist.
      - If a dictionary is given, the word must appear in it.
     """
-    words = set()
+    return sorted(
+      [self.word_at(w) for w in self.find_word_locs(length, prefix, dictionary)]
+    )
+
+  def find_word_locs(self, length, prefix="", dictionary=None):
+    """
+    Return a list of coordinate lists of the given length that correspond
+    to words that can be made by combining the letters in the matrix, 
+    following these rules:
+     - The first element in the word can be any element in the matrix
+     - Adjacent elements in the word must be neighbors in the matrix
+     - Each element in the matrix can be used only once
+     - The word must begin with the given prefix. If the prefix is 
+       longer than the desired word length no solutions will exist.
+     - If a dictionary is given, the word must appear in it.
+
+    This is similar to finding words in the matrix, but we return the
+    locations of the letters in the word rather than the letters 
+    themselves. This is useful because there can be multiple ways to
+    make a given word. 
+    """
+    word_locs = []
     for row in range(self.row_count()):
       for col in range(self.column_count()):
         if self.is_letter(row, col):
-          potential_words = self._rec_find_words(
+          potential_word_locs = self._rec_find_word_locs(
             length, row, col, {(row, col)}, prefix
           )
           if dictionary:
-            potential_words = { 
-              w for w in potential_words if dictionary.contains(w) 
-            }
-          words |= potential_words
-    return sorted(list(words))
+            potential_word_locs = [ 
+              w for w in potential_word_locs if dictionary.contains(self.word_at(w)) 
+            ]
+          word_locs += potential_word_locs
+    return word_locs
 
-  def _rec_find_words(self, length, start_row, start_col, used_coords, prefix):
+  def _rec_find_word_locs(
+      self, length, start_row, start_col, used_coords, prefix
+  ):
     """
-    Find words in the matrix as described in `find_words` matching the 
-    given requirements.
+    Find word locations in the matrix as described in `find_word_locs` 
+    matching the given requirements.
 
     length (int) -- Return words of exactly this length
     start_row (int), start_col (int) -- the coordinates of the letter
@@ -123,30 +156,30 @@ class LetterMatrix:
     prefix (str) -- words must begin with this prefix. If the prefix
       is longer than the desired word length, no solutions will exist.
     """
-    words = set()
-    head = self.element(start_row, start_col)
+    word_coords = []
+    head_letter = self.element(start_row, start_col)
 
     if len(prefix) > length:
       # Short circuit if prefix length means there are no valid solutions
       pass
-    elif prefix and prefix[0].upper() != head.upper():
+    elif prefix and prefix[0].upper() != head_letter.upper():
       # Short circuit if this path doesn't result in words that 
       # match our prefix
       pass
     elif length == 1:
-      words.add(head)
+      word_coords += [[(start_row, start_col)]]
     elif length > 1:
       for (r, c) in self.neighbors(start_row, start_col):
         if (r, c) not in used_coords:
-          tails = self._rec_find_words(
+          tails = self._rec_find_word_locs(
             length - 1, 
             r, c, 
             used_coords | {(r, c)}, 
             prefix[1:]
           )
-          words |= { head + tail for tail in tails }
+          word_coords += [[(start_row, start_col)] + tail for tail in tails ]
     
-    return words
+    return word_coords
 
 
 class InvalidLetterMatrixException(Exception):

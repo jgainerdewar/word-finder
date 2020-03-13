@@ -1,9 +1,10 @@
 import re
+import copy
 
 class LetterMatrix:
   """
   Represents a two-dimensional array in which each element is either
-  a single letter or the empty string.
+  a single letter or the empty string. 
   """
   LETTER_REGEX = re.compile('^[A-Za-z]?$')
 
@@ -21,6 +22,7 @@ class LetterMatrix:
   def __init__(self, matrix):
     LetterMatrix.validate(matrix)
     self.matrix = matrix
+    # TODO control whether columns are collapsed at an instance level?
 
   @staticmethod
   def validate(matrix):
@@ -180,6 +182,47 @@ class LetterMatrix:
           word_coords += [[(start_row, start_col)] + tail for tail in tails ]
     
     return word_coords
+
+  def remove_word(self, coords, collapse=True):
+    """
+    Remove the letters at the given coordinates (replace with the 
+    empty string). If `collapse` is True, we also collapse each column 
+    of letters down so that no letter is "above" an empty string. 
+    """
+    for (r, c) in coords:
+      self.matrix[r][c] = ''
+
+    if collapse:
+      self.collapse_columns()
+
+  def collapse_columns(self):
+    """
+    Shift the elements in the matrix so that each column is "collapsed."
+    Within each column, all empty elements should be in rows higher 
+    than all letters. To achieve this, we shift letters down to lower 
+    rows in each column. No letter changes column, and letters retain
+    their ordering within each column. 
+    """
+    for col in range(self.column_count()):
+      for row in range(self.row_count() - 1):
+        if self.element(row, col) == '':
+          next_letter_coord = self._next_letter_above(row, col)
+          if next_letter_coord:
+            (ltr_row, ltr_col) = next_letter_coord
+            self.matrix[row][col] = self.element(ltr_row, ltr_col)
+            self.matrix[ltr_row][ltr_col] = ''
+
+
+  def _next_letter_above(self, row, col):
+    """Return the (row, col) of the letter with the same col and lowest
+    row above this one, or None if no such letter exists."""
+    ret_coords = None
+    this_row = row + 1
+    while this_row < self.row_count() and ret_coords is None:
+      if self.is_letter(this_row, col):
+        ret_coords = (this_row, col)
+      this_row += 1
+    return ret_coords
 
 
 class InvalidLetterMatrixException(Exception):

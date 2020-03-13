@@ -1,5 +1,6 @@
 from wordfinder import LetterMatrix, InvalidLetterMatrixException
 from nose.tools import assert_raises, assert_equal
+import copy
 
 class TestLetterMatrix():
 
@@ -9,7 +10,7 @@ class TestLetterMatrix():
     ['H', 'I', 'J', 'K', 'L'],
     ['' , '' , '' , '' , '' ],
     ['M', '' , 'N', '' , 'O'],
-    ['P', 'Q', 'R', 'S', 'T'],
+    ['P', 'Q', 'R', 'S', '' ],
   ])
 
   def test_validate_row_length(self):
@@ -176,3 +177,21 @@ class TestLetterMatrix():
     assert_equal(row_matrix.find_words(2, 'C'), ['CB', 'CD'])
     assert_equal(row_matrix.find_words(3, 'A'), ['ABC', 'AHG', 'AIJ'])
     assert_equal(row_matrix.find_words(3, 'ai'), ['AIJ'])
+
+  def test_next_letter_above(self):
+    assert_equal(self.fixture._next_letter_above(4, 4), None)
+    assert_equal(self.fixture._next_letter_above(5, 1), None)
+    assert_equal(self.fixture._next_letter_above(0, 0), (1, 0))
+    assert_equal(self.fixture._next_letter_above(2, 3), (5, 3))
+
+  def test_collapse_columns(self):
+    matrix = copy.deepcopy(self.fixture)
+    matrix.collapse_columns()
+    assert_equal(matrix.matrix, [
+      ['E', 'A', 'B', 'C', 'D'],
+      ['H', 'F', 'J', 'G', 'L'],
+      ['M', 'I', 'N', 'K', 'O'],
+      ['P', 'Q', 'R', 'S', '' ],
+      ['' , '' , '' , '' , '' ],
+      ['' , '' , '' , '' , '' ],
+    ])

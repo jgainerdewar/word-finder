@@ -1,2 +1,3 @@
 from wordfinder.letter_matrix import LetterMatrix, InvalidLetterMatrixException
 from wordfinder.dictionary import Dictionary
+from wordfinder.solve import solve_word_game

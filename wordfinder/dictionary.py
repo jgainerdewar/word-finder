@@ -24,6 +24,8 @@ class Dictionary:
           words_on_disk = c
           break
 
+    self.dictionary_words = set()
+    self.path = words_on_disk
     with open(words_on_disk) as f:
       self.dictionary_words = { w.upper() for w in f.read().splitlines()}
 

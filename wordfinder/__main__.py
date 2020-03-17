@@ -61,23 +61,28 @@ def main(args=None):
 
   if parsed_args.prefix:
     solutions = [
-      matrix.find_words(
-        parsed_args.word_lengths[0], 
-        parsed_args.prefix, 
+      sorted(set(
+        matrix.find_words(
+          parsed_args.word_lengths[0], 
+          parsed_args.prefix, 
+          dictionary
+        )
+      ))
+    ]
+    
+  else:
+    solutions = sorted(set(
+      wordfinder.solve_word_game(
+        matrix,
+        parsed_args.word_lengths, 
         dictionary
       )
-    ]
-  else:
-    solutions = wordfinder.solve_word_game(
-      matrix,
-      parsed_args.word_lengths, 
-      dictionary
-    )
+    ))
 
   sep = "-"*20
   if not solutions:
     print("No solutions found")
-  for solution in sorted(set(solutions)):
+  for solution in solutions:
     print(sep)
     for word in solution:
       print(word.upper())

@@ -3,7 +3,7 @@ import copy
 def solve_word_game(matrix, word_lengths, dictionary):
   solutions = []
   # Get all possible solutions for the first word
-  subsolns = matrix.find_word_locs(word_lengths[0], dictionary=dictionary)
+  subsolns = matrix.find_word_coords(word_lengths[0], dictionary=dictionary)
   for s in subsolns:
     word = matrix.word_at(s)
     remaining_word_lengths = word_lengths[1:]

@@ -108,10 +108,10 @@ class LetterMatrix:
      - If a dictionary is given, the word must appear in it.
     """
     return sorted(
-      [self.word_at(w) for w in self.find_word_locs(length, prefix, dictionary)]
+      [self.word_at(w) for w in self.find_word_coords(length, prefix, dictionary)]
     )
 
-  def find_word_locs(self, length, prefix="", dictionary=None):
+  def find_word_coords(self, length, prefix="", dictionary=None):
     """
     Return a list of coordinate lists of the given length that correspond
     to words that can be made by combining the letters in the matrix, 
@@ -128,25 +128,25 @@ class LetterMatrix:
     themselves. This is useful because there can be multiple ways to
     make a given word. 
     """
-    word_locs = []
+    word_coords = []
     for row in range(self.row_count()):
       for col in range(self.column_count()):
         if self.is_letter(row, col):
-          potential_word_locs = self._rec_find_word_locs(
+          potential_word_coords = self._rec_find_word_coords(
             length, row, col, {(row, col)}, prefix
           )
           if dictionary:
-            potential_word_locs = [ 
-              w for w in potential_word_locs if dictionary.contains(self.word_at(w)) 
+            potential_word_coords = [ 
+              w for w in potential_word_coords if dictionary.contains(self.word_at(w)) 
             ]
-          word_locs += potential_word_locs
-    return word_locs
+          word_coords += potential_word_coords
+    return word_coords
 
-  def _rec_find_word_locs(
+  def _rec_find_word_coords(
       self, length, start_row, start_col, used_coords, prefix
   ):
     """
-    Find word locations in the matrix as described in `find_word_locs` 
+    Find word locations in the matrix as described in `find_word_coords` 
     matching the given requirements.
 
     length (int) -- Return words of exactly this length
@@ -173,7 +173,7 @@ class LetterMatrix:
     elif length > 1:
       for (r, c) in self.neighbors(start_row, start_col):
         if (r, c) not in used_coords:
-          tails = self._rec_find_word_locs(
+          tails = self._rec_find_word_coords(
             length - 1, 
             r, c, 
             used_coords | {(r, c)}, 
